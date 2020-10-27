@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/roedicker/NTrace/blob/develop/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/roedicker/NTrace</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>Features:
+
+- [#62] - Add Trace Options to Trace Service Interface
+    </releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Trace Log</tags>
+  </metadata>
+</package>
