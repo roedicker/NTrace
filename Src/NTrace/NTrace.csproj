@@ -53,7 +53,7 @@
     <Compile Include="Interfaces\ITraceObjectSerializer.cs" />
     <Compile Include="Interfaces\ITracer.cs" />
     <Compile Include="Interfaces\ITraceService.cs" />
-    <Compile Include="Models\Application\Assembly.cs" />
+    <Compile Include="Models\Application\AssemblyInfo.cs" />
     <Compile Include="Models\Application\Number.cs" />
     <Compile Include="Models\NTrace\TracableBase.cs" />
     <Compile Include="Models\NTrace\TraceCategories.cs" />
