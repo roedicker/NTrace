@@ -8,12 +8,6 @@ namespace NTrace.Services
   /// </summary>
   public class FileTracer : ITracer
   {
-    public ITraceService TraceService
-    {
-      get;
-      set;
-    }
-
     /// <summary>
     /// Gets the lock object for this service
     /// </summary>
@@ -25,7 +19,7 @@ namespace NTrace.Services
     /// <summary>
     /// Gets the stream writer for writing the file log.
     /// </summary>
-    protected StreamWriter StreamWriter
+    protected StreamWriter? StreamWriter
     {
       get;
       private set;
@@ -147,6 +141,9 @@ namespace NTrace.Services
     /// </summary>
     public FileTracer()
     {
+      this.StreamWriter = null;
+      this.FilePath = String.Empty;
+      this.FileName = String.Empty;
       this.LockObject = new object();
       this.Append = true;
       this.AutoFlush = false;
@@ -161,28 +158,46 @@ namespace NTrace.Services
       CloseStream();
     }
 
+    /// <summary>
+    /// Writes an error message
+    /// </summary>
+    /// <param name="message">Message to write</param>
     public void Error(string message)
     {
-      Write(message, TraceCategories.All, TraceType.Error);
+      Write(message, TraceType.Error);
     }
 
+    /// <summary>
+    /// Writes a warning message
+    /// </summary>
+    /// <param name="message"></param>
     public void Warn(string message)
     {
-      Write(message, TraceCategories.All, TraceType.Warning);
+      Write(message, TraceType.Warning);
     }
 
+    /// <summary>
+    /// Writes an information message
+    /// </summary>
+    /// <param name="message">Message to write</param>
+    /// <param name="category">Category of message</param>
     public void Info(string message, TraceCategories category = TraceCategories.Debug)
     {
-      Write(message, category, TraceType.Information);
+      Write(message, TraceType.Information);
     }
 
-    internal void Write(string message, TraceCategories category, TraceType type)
+    /// <summary>
+    /// Writes a message
+    /// </summary>
+    /// <param name="message">Message to write</param>
+    /// <param name="type">Trace type</param>
+   internal void Write(string message, TraceType type)
     {
       try
       {
         if (CheckStream())
         {
-          this.StreamWriter.WriteLine($"{DateTime.Now.ToIsoDateTimeString()} {type.GetDisplayName()} {message}");
+          this.StreamWriter?.WriteLine($"{DateTime.Now.ToIsoDateTimeString()} {type.GetDisplayName()} {message}");
 
           // file can be shared if the stream is closed only
           if (this.Share)

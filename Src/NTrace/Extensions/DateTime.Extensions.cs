@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace NTrace
 {
@@ -32,7 +33,7 @@ namespace NTrace
     /// </example>
     public static string ToIsoDateString(this DateTime date)
     {
-      return String.Format("{0:yyyy}-{0:MM}-{0:dd}", date);
+      return String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}", date);
     }
 
 
@@ -56,7 +57,7 @@ namespace NTrace
     /// <param name="useMilliseconds">Optional. Indicator whether milliseconds have to be used or not. Default value is <strong>false</strong>.</param>
     /// <returns>The referred date and time as ISO formatted string</returns>
     /// <remarks>
-    /// Official ISO format for date/time combination is: &lt;YYYY&gt;-&lt;MM&gt;-&lt;DD&gt;&nbsp;&lt;hh&gt;:&lt;mm&gt;:&lt;ss&gt;
+    /// Official ISO format for date/time combination is: &lt;YYYY&gt;-&lt;MM&gt;-&lt;DD&gt; &lt;hh&gt;:&lt;mm&gt;:&lt;ss&gt;
     /// <p>
     ///   <ul>
     ///     <li>YYYY - Year (4 digits)</li>
@@ -83,20 +84,20 @@ namespace NTrace
     {
       if (useMilliseconds)
       {
-        return String.Format("{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}.{0:fff}", date);
+        return String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}.{0:fff}", date);
       }
       else
       {
-        return String.Format("{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}", date);
+        return String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd} {0:HH}:{0:mm}:{0:ss}", date);
       }
     }
 
     /// <summary>
     /// Creates a string equal to the referred date and time value in W3CDTF format.
     /// </summary>
-    /// <param name="dateTime">Local date and time value to convert to string. Use Now() to use current local date and time.</param>
-    /// <param name="useUtcDesignator">Optional. Indicator whether using the UTC designator or not. Default value is <strong>true</strong></param>
-    /// <param name="useMilliseconds">Optional. Indicator whether milliseconds have to be used or not. Default value is <strong>false</strong>.</param>
+    /// <param name="date">Local date and time value to convert to string. Use Now() to use current local date and time.</param>
+    /// <param name="useUtcDesignator">Optional. Indicator whether using the UTC designator or not. Default value is <c>true</c></param>
+    /// <param name="useMilliseconds">Optional. Indicator whether milliseconds have to be used or not. Default value is <c>false</c>.</param>
     /// <returns>The referred local date and time as W3CDTF formatted string.</returns>
     /// <remarks>
     /// Official W3CDTF format for date/time combination is: &lt;YYYY&gt;-&lt;MM&gt;-&lt;DD&gt;T&lt;hh&gt;:&lt;mm&gt;:&lt;ss&gt;[TZD]
@@ -122,11 +123,11 @@ namespace NTrace
       {
         if (useMilliseconds)
         {
-          Result = String.Format("{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}.{0:fff}{1}", date, useUtcDesignator ? "Z" : "+00:00");
+          Result = String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}.{0:fff}{1}", date, useUtcDesignator ? "Z" : "+00:00");
         }
         else
         {
-          Result = String.Format("{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}{1}", date, useUtcDesignator ? "Z" : "+00:00");
+          Result = String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}{1}", date, useUtcDesignator ? "Z" : "+00:00");
         }
       }
       else
@@ -135,11 +136,11 @@ namespace NTrace
         {
           if (useMilliseconds)
           {
-            Result = String.Format("{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}.{0:fff}+{1:d02}:00", date, iTimeZoneDifference);
+            Result = String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}.{0:fff}+{1:d02}:00", date, iTimeZoneDifference);
           }
           else
           {
-            Result = String.Format("{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}+{1:d02}:00", date, iTimeZoneDifference);
+            Result = String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}+{1:d02}:00", date, iTimeZoneDifference);
           }
 
         }
@@ -147,11 +148,11 @@ namespace NTrace
         {
           if (useMilliseconds)
           {
-            Result = String.Format("{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}.{0:fff}{1:d02}:00", date, iTimeZoneDifference);
+            Result = String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}.{0:fff}{1:d02}:00", date, iTimeZoneDifference);
           }
           else
           {
-            Result = String.Format("{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}{1:d02}:00", date, iTimeZoneDifference);
+            Result = String.Format(CultureInfo.InvariantCulture, "{0:yyyy}-{0:MM}-{0:dd}T{0:HH}:{0:mm}:{0:ss}{1:d02}:00", date, iTimeZoneDifference);
           }
         }
       }
@@ -163,6 +164,7 @@ namespace NTrace
     /// Creates a string equal to the referred date (time) value in ISO format.
     /// </summary>
     /// <param name="date">Date (time part) value to convert to string. Use DateTime.Now to use current time.</param>
+    /// <param name="useMilliseconds">Optional. Indicator whether milliseconds have to be used or not. Default value is <c>false</c>.</param>
     /// <returns>The referred time as ISO formatted string.</returns>
     /// <remarks>
     /// Official ISO format for time is: &lt;hh&gt;:&lt;mm&gt;:&lt;ss&gt;
@@ -189,11 +191,11 @@ namespace NTrace
     {
       if (useMilliseconds)
       {
-        return String.Format("{0:HH}:{0:mm}:{0:ss}.fff", date);
+        return String.Format(CultureInfo.InvariantCulture, "{0:HH}:{0:mm}:{0:ss}.fff", date);
       }
       else
       {
-        return String.Format("{0:HH}:{0:mm}:{0:ss}", date);
+        return String.Format(CultureInfo.InvariantCulture, "{0:HH}:{0:mm}:{0:ss}", date);
       }
     }
   }

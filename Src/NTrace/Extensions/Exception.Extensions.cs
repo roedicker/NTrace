@@ -13,7 +13,7 @@ namespace NTrace
 
       while (oException != null)
       {
-        if (sbResult.Length > 0 && !sbResult.ToString().EndsWith(delimeter))
+        if (sbResult.Length > 0 && !sbResult.ToString().EndsWith(delimeter, StringComparison.InvariantCulture))
         {
           sbResult.Append(delimeter);
         }
