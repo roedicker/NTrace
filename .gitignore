@@ -1,0 +1,9 @@
+*.suo
+*.user
+/src/.vs
+/src/NTrace/bin
+/src/NTrace/obj
+/src/NTrace.Tests/bin
+/src/NTrace.Tests/obj
+/src/NTrace.Adapters.NLog/bin
+/src/NTrace.Adapters.NLog/obj
