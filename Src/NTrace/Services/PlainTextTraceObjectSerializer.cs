@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -9,20 +8,39 @@ using System.Text;
 
 using NTrace.Attributes;
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("NTrace.Tests")]
+
 namespace NTrace.Services
 {
+  /// <summary>
+  /// Defines the plain-text object serializer
+  /// </summary>
   internal class PlainTextTraceObjectSerializer : ITraceObjectSerializer
   {
+    /// <summary>
+    /// Gets the trace options
+    /// </summary>
     protected TraceOptions Options
     {
       get;
     }
 
+    /// <summary>
+    /// Creates a new instance of the plain-text object serializer
+    /// </summary>
+    /// <param name="options">Trace options</param>
     public PlainTextTraceObjectSerializer(TraceOptions options)
     {
       this.Options = options ?? throw new ArgumentNullException(nameof(options));
     }
 
+    /// <summary>
+    /// Serializes a named data object
+    /// </summary>
+    /// <param name="name">Name of the data to serialize</param>
+    /// <param name="data">Data to serialize</param>
+    /// <param name="maxDepth">Maximum depth of serialization</param>
+    /// <returns>Serialized data</returns>
     public string Serialize(string name, object data, int? maxDepth = null)
     {
       StringBuilder Result = new StringBuilder();
@@ -37,6 +55,11 @@ namespace NTrace.Services
       return Result.ToString();
     }
 
+    /// <summary>
+    /// Gets the properties of an object
+    /// </summary>
+    /// <param name="member">Object to analyze</param>
+    /// <returns>Array of property information</returns>
     private PropertyInfo[] GetProperties(object member)
     {
       if (member == null)
@@ -47,11 +70,22 @@ namespace NTrace.Services
       return member.GetType().GetProperties();
     }
 
+    /// <summary>
+    /// Gets an indicator whether a data-type is a basic one
+    /// </summary>
+    /// <param name="type">Data-type to analyze</param>
+    /// <returns>Indicator whether a given data-type is abasic data-type or not</returns>
     private bool IsBasicType(Type type)
     {
       return _BasicTypes.Contains(type?.FullName);
     }
 
+    /// <summary>
+    /// Gets an indicator whether a property is secutity relevant or not
+    /// </summary>
+    /// <param name="name">Name of the property</param>
+    /// <param name="type">Data-type of the property</param>
+    /// <returns>Indicator whether a property is security relevant or not</returns>
     private bool IsSecurityRelevantMember(string name, Type type)
     {
       if (name == null)
@@ -72,7 +106,15 @@ namespace NTrace.Services
       }
     }
 
-    private void SerializeMember(StringBuilder builder, string name, object value, int level, int maxLevel)
+    /// <summary>
+    /// Serializes a member
+    /// </summary>
+    /// <param name="builder">Builder for this serialization</param>
+    /// <param name="name">Name of the member</param>
+    /// <param name="value">Value of the member</param>
+    /// <param name="level">Depth level</param>
+    /// <param name="maxLevel">Maximum depth level</param>
+    private void SerializeMember(StringBuilder builder, string name, object? value, int level, int maxLevel)
     {
       if (builder == null)
       {
@@ -138,13 +180,15 @@ namespace NTrace.Services
             }
             else
             {
-              if (oInfo.GetValue(value) is IEnumerable)
+              object oValue = oInfo.GetValue(value);
+
+              if (oValue is IEnumerable)
               {
-                SerializeEnumeration(builder, oInfo.Name, oInfo.GetValue(value) as IEnumerable, level, maxLevel);
+                SerializeEnumeration(builder, oInfo.Name, oValue as IEnumerable, level, maxLevel);
               }
               else
               {
-                SerializeMember(builder, oInfo.Name, oInfo.GetValue(value), level, maxLevel);
+                SerializeMember(builder, oInfo.Name, oValue, level, maxLevel);
               }
             }
           }
@@ -152,7 +196,15 @@ namespace NTrace.Services
       }
     }
 
-    private void SerializeEnumeration(StringBuilder builder, string name, IEnumerable enumeration, int level, int maxLevel)
+    /// <summary>
+    /// Serialzes an enumeration
+    /// </summary>
+    /// <param name="builder">Builder for this serialization</param>
+    /// <param name="name">Name of the enumeration</param>
+    /// <param name="enumeration">Enumeration value</param>
+    /// <param name="level">Depth level</param>
+    /// <param name="maxLevel">Maximum depth level</param>
+    private void SerializeEnumeration(StringBuilder builder, string name, IEnumerable? enumeration, int level, int maxLevel)
     {
       if (builder == null)
       {
@@ -205,6 +257,12 @@ namespace NTrace.Services
       }
     }
 
+    /// <summary>
+    /// Formats a name by its depth level
+    /// </summary>
+    /// <param name="name">Name to format</param>
+    /// <param name="level">Depth level</param>
+    /// <returns>Formatted name by given depth level</returns>
     private string FormatName(string name, int level)
     {
       if (String.IsNullOrEmpty(name))
@@ -223,7 +281,7 @@ namespace NTrace.Services
         return $"{_IndentCharacter.PadLeft(iIndention)}{name}:{Environment.NewLine}";
       }
     }
-    private string FormatValue(string name, string value, int level)
+    private string FormatValue(string name, string? value, int level)
     {
       if (String.IsNullOrEmpty(name))
       {
@@ -251,7 +309,14 @@ namespace NTrace.Services
       }
     }
 
-    private string FormatValue(string name, object value, int level)
+    /// <summary>
+    /// Formats a property value by its name and depth level
+    /// </summary>
+    /// <param name="name">Name of the property</param>
+    /// <param name="value">Property value</param>
+    /// <param name="level">Depth level</param>
+    /// <returns>Formatted property value by given name and depth level</returns>
+    private string FormatValue(string name, object? value, int level)
     {
       if (String.IsNullOrEmpty(name))
       {
@@ -260,7 +325,7 @@ namespace NTrace.Services
 
       if (value == null)
       {
-        return FormatValue(name, (string)value, level);
+        return FormatValue(name, value as string, level);
       }
       else
       {
@@ -268,9 +333,9 @@ namespace NTrace.Services
         {
           return FormatValue(name, time.ToIsoDateTimeString(true), level);
         }
-        else if (value is String)
+        else if (value is string)
         {
-          string sValue = Convert.ToString(value);
+          string sValue = Convert.ToString(value, CultureInfo.InvariantCulture);
           bool bContainsDoubleQuotes = sValue.Contains("\"");
           bool bContainsSingleQuotes = sValue.Contains("'");
 
@@ -278,7 +343,7 @@ namespace NTrace.Services
           {
             return FormatValue(name, sValue, level);
           }
-          else if(bContainsDoubleQuotes)
+          else if (bContainsDoubleQuotes)
           {
             return FormatValue(name, $@"'{sValue}'", level);
           }
@@ -289,11 +354,16 @@ namespace NTrace.Services
         }
         else
         {
-          return FormatValue(name, Convert.ToString(value), level);
+          return FormatValue(name, Convert.ToString(value, CultureInfo.InvariantCulture), level);
         }
       }
     }
 
+    /// <summary>
+    /// Gets the current idention
+    /// </summary>
+    /// <param name="level">Depth level</param>
+    /// <returns>Current indention by options and given depth level</returns>
     private int GetIndention(int level)
     {
       return level * this.Options.IndentionWidth;

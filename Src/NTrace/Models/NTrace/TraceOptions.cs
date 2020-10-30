@@ -1,7 +1,10 @@
-﻿using System;
+using System;
 
 namespace NTrace
 {
+  /// <summary>
+  /// Defines the trace options of a tracer
+  /// </summary>
   public class TraceOptions
   {
     /// <summary>
@@ -25,7 +28,7 @@ namespace NTrace
 
       set
       {
-        if(value < 0)
+        if (value < 0)
         {
           throw new ArgumentOutOfRangeException(nameof(value), "Indention width must not be negative");
         }
@@ -52,6 +55,9 @@ namespace NTrace
       set;
     }
 
+    /// <summary>
+    /// Gets or sets the inspection depth
+    /// </summary>
     public int InspectionDepth
     {
       get
@@ -60,7 +66,7 @@ namespace NTrace
       }
       set
       {
-        if(value < 0)
+        if (value < 0)
         {
           throw new ArgumentOutOfRangeException(nameof(value), "Inspection depth must not be negative");
         }
@@ -74,6 +80,9 @@ namespace NTrace
       }
     }
 
+    /// <summary>
+    /// Creates a new instance of trace options
+    /// </summary>
     public TraceOptions()
     {
       this.UseIndention = true;

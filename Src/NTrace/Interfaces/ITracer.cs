@@ -2,6 +2,9 @@ using System;
 
 namespace NTrace
 {
+  /// <summary>
+  /// Interface of a tracer
+  /// </summary>
   public interface ITracer
   {
     /// <summary>

@@ -1,8 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace NTrace
 {
+  /// <summary>
+  /// Interface of a trace managemenr service
+  /// </summary>
   public interface ITraceManagementService
   {
     /// <summary>

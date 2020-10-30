@@ -134,7 +134,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.None;
-      string message = $"Error Message {Guid.NewGuid().ToString()}";
+      string message = $"Error Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -150,7 +150,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.None;
-      string message = $"Warn Message {Guid.NewGuid().ToString()}";
+      string message = $"Warn Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -166,7 +166,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Application;
-      string message = $"Application Message {Guid.NewGuid().ToString()}";
+      string message = $"Application Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -182,7 +182,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Connection;
-      string message = $"Connection Message {Guid.NewGuid().ToString()}";
+      string message = $"Connection Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -198,7 +198,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Data;
-      string message = $"Data Message {Guid.NewGuid().ToString()}";
+      string message = $"Data Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
       this.TraceOptions.InspectionDepth = 5;
@@ -303,7 +303,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Debug;
-      string message = $"Debug Message {Guid.NewGuid().ToString()}";
+      string message = $"Debug Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -319,7 +319,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Method;
-      string message = $"Method Message {Guid.NewGuid().ToString()}";
+      string message = $"Method Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -335,7 +335,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Query;
-      string message = $"Query Message {Guid.NewGuid().ToString()}";
+      string message = $"Query Message {Guid.NewGuid()}";
       string expected = $"{message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -351,7 +351,7 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Application;
-      string message = $"Indented Message {Guid.NewGuid().ToString()}";
+      string message = $"Indented Message {Guid.NewGuid()}";
       string expected = $"  {message}{Environment.NewLine}";
       this.ActualMessages.Clear();
 
@@ -376,9 +376,9 @@ namespace NTrace.Tests
     {
       // arrange
       this.ManagementService.Categories = TraceCategories.Application;
-      string message1 = $"Indented Message #1 {Guid.NewGuid().ToString()}";
+      string message1 = $"Indented Message #1 {Guid.NewGuid()}";
       string expected1 = $"  {message1}{Environment.NewLine}";
-      string message2 = $"Indented Message #2 {Guid.NewGuid().ToString()}";
+      string message2 = $"Indented Message #2 {Guid.NewGuid()}";
       string expected2 = $"    {message2}{Environment.NewLine}";
 
       this.TraceService.BeginMethod();
@@ -424,7 +424,7 @@ namespace NTrace.Tests
       // arrange
       this.ManagementService.Categories = TraceCategories.Application | TraceCategories.Method;
       this.TraceService.Options.UseMethodDurations = true;
-      string message = $"Indented Message {Guid.NewGuid().ToString()}";
+      string message = $"Indented Message {Guid.NewGuid()}";
       string expected = $"  +----------------------------------------------------------------------------------+{Environment.NewLine}" +
                         $"  | Indented_Begin_Method_Message_With_Time_Tracking_Is_Written >                    |{Environment.NewLine}" +
                         $"  +----------------------------------------------------------------------------------+{Environment.NewLine}" +
@@ -454,7 +454,7 @@ namespace NTrace.Tests
       // arrange
       this.ManagementService.Categories = TraceCategories.Application | TraceCategories.Method;
       this.TraceService.Options.UseMethodDurations = false;
-      string message = $"Indented Message {Guid.NewGuid().ToString()}";
+      string message = $"Indented Message {Guid.NewGuid()}";
       string expected = $"  +----------------------------------------------------------------------------------+{Environment.NewLine}" +
                         $"  | Indented_Begin_Method_Message_Without_Time_Tracking_Is_Written                   |{Environment.NewLine}" +
                         $"  +----------------------------------------------------------------------------------+{Environment.NewLine}" +
@@ -506,7 +506,7 @@ namespace NTrace.Tests
       string expected = String.Empty;
 
       // act
-      this.TraceService.Application($"Application Message {Guid.NewGuid().ToString()}");
+      this.TraceService.Application($"Application Message {Guid.NewGuid()}");
 
       // assert
       Assert.AreEqual(expected, GetActualMessages());
@@ -521,7 +521,7 @@ namespace NTrace.Tests
       string expected = String.Empty;
 
       // act
-      this.TraceService.Info($"Info Message {Guid.NewGuid().ToString()}", TraceCategories.All);
+      this.TraceService.Info($"Info Message {Guid.NewGuid()}", TraceCategories.All);
 
       // assert
       Assert.AreEqual(expected, GetActualMessages());

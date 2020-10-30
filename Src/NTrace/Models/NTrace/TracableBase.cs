@@ -2,19 +2,32 @@ using System;
 
 namespace NTrace
 {
+  /// <summary>
+  /// Base class of a traceable class
+  /// </summary>
   public abstract class TraceableBase : ITraceable
   {
-    public virtual ITraceService TraceService
+    /// <summary>
+    /// Gets or sets the trace service
+    /// </summary>
+    public virtual ITraceService? TraceService
     {
       get;
       set;
     }
 
+    /// <summary>
+    /// Creates a new instance of the base traceable class
+    /// </summary>
     protected TraceableBase()
     {
       this.TraceService = null;
     }
 
+    /// <summary>
+    /// Creates a new instance of the base traceable class with initial trace service
+    /// </summary>
+    /// <param name="traceService">Trace service</param>
     protected TraceableBase(ITraceService traceService)
     {
       this.TraceService = traceService ?? throw new ArgumentNullException(nameof(traceService));

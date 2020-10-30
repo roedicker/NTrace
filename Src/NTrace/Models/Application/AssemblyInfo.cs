@@ -57,7 +57,7 @@ namespace NTrace
 
       DateTime Result = new DateTime(1970, 1, 1, 0, 0, 0);
       byte[] abBuffer = new byte[2048];
-      Stream fsFile = null;
+      Stream? fsFile = null;
 
       try
       {
@@ -76,7 +76,9 @@ namespace NTrace
       int iSecondsSince1970 = BitConverter.ToInt32(abBuffer, iData + iLinkerTimestampOffset);
 
       Result = Result.AddSeconds(iSecondsSince1970);
-      Result = Result.AddHours(TimeZone.CurrentTimeZone.GetUtcOffset(Result).Hours);
+
+      TimeZoneInfo oTimeZoneInfo = TimeZoneInfo.Local;
+      Result = Result.AddHours(oTimeZoneInfo.GetUtcOffset(Result).Hours);
 
       return Result;
     }
