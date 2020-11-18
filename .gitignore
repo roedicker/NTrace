@@ -7,3 +7,9 @@
 /src/NTrace.Tests/obj
 /src/NTrace.Adapters.NLog/bin
 /src/NTrace.Adapters.NLog/obj
+/docs/Samples/Console Framework Application/Example-02/Example-02.Application/bin
+/docs/Samples/Console Framework Application/Example-02/Example-02.Application/obj
+/docs/Samples/Console Framework Application/Example-02/Example-02.Common/bin
+/docs/Samples/Console Framework Application/Example-02/Example-02.Common/obj
+/docs/Samples/Console Framework Application/Example-02/Example-02.Core/bin
+/docs/Samples/Console Framework Application/Example-02/Example-02.Core/obj

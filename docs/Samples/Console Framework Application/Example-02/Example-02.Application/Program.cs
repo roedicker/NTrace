@@ -2,13 +2,14 @@
 
 using Autofac;
 
+using NLog;
+
 using NTrace;
+using NTrace.Adapters;
 using NTrace.Services;
 
 using Example_02.Common.Services;
 using Example_02.Core;
-using NTrace.Adapters;
-using NLog;
 
 namespace Example_02
 {
@@ -24,6 +25,7 @@ namespace Example_02
         SetupTraceManagement();
 
         IApplicationService Application = IocContainer.Resolve<IApplicationService>();
+        ITraceService TraceService = IocContainer.Resolve<ITraceService>();
 
         try
         {
@@ -32,13 +34,18 @@ namespace Example_02
         }
         catch (Exception ex)
         {
-          ITraceService TraceService = IocContainer.Resolve<ITraceService>();
-
           TraceService.Error(ex.Message);
         }
         finally
         {
-          Application.EndApplication();
+          try
+          {
+            Application.EndApplication();
+          }
+          finally
+          {
+            TraceService.EndWrite();
+          }
         }
       }
       catch (Exception ex)
