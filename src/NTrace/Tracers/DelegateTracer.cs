@@ -1,6 +1,6 @@
 using System;
 
-namespace NTrace.Services
+namespace NTrace.Tracers
 {
   /// <summary>
   /// Signature of a trace action
@@ -16,7 +16,7 @@ namespace NTrace.Services
   public delegate void TraceCategorizedAction(string message, TraceCategories categories);
 
   /// <summary>
-  /// Defines a delegate tracer
+  /// Defines a synchronous delegate tracer
   /// </summary>
   public class DelegateTracer : ITracer
   {

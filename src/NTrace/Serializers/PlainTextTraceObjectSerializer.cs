@@ -10,7 +10,7 @@ using NTrace.Attributes;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("NTrace.Tests")]
 
-namespace NTrace.Services
+namespace NTrace.Serializers
 {
   /// <summary>
   /// Defines the plain-text object serializer

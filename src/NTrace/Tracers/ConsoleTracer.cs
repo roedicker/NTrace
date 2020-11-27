@@ -1,12 +1,20 @@
 using System;
 
-namespace NTrace.Services
+namespace NTrace.Tracers
 {
   /// <summary>
-  /// Defines the console tracer
+  /// Defines the synchronous console tracer
   /// </summary>
   public class ConsoleTracer : ITracer
   {
+    /// <summary>
+    /// Creates a new instance of the synchronous console tracer
+    /// </summary>
+    public ConsoleTracer()
+    {
+      // not used
+    }
+
     /// <summary>
     /// Signals the end of writing traces
     /// </summary>

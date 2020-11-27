@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+
+using NTrace.Serializers;
 
 namespace NTrace.Services
 {
   /// <summary>
   /// Defines the default trace service
   /// </summary>
-  public class DefaultTraceService : ITraceService
+  public class DefaultTraceService : ITraceService, IDisposable
   {
     /// <summary>
     /// Gets the management service
@@ -53,6 +57,40 @@ namespace NTrace.Services
     }
 
     /// <summary>
+    /// Gets an indicator whether the trace has been ended or not
+    /// </summary>
+    protected bool IsEnded
+    {
+      get;
+      private set;
+    }
+
+    /// <summary>
+    /// Gets the queue of asynchronous messages
+    /// </summary>
+    public Queue<Message> Messages
+    {
+      get;
+    }
+
+    /// <summary>
+    /// Gets the manual reset-event for stopping the asynchronous message process
+    /// </summary>
+    private ManualResetEvent ProcessMessagesStopEvent
+    {
+      get;
+    }
+
+    /// <summary>
+    /// Gets or sets the asynchronous message worker
+    /// </summary>
+    private Task MessageWorker
+    {
+      get;
+      set;
+    }
+
+    /// <summary>
     /// Creates a new instance of the default trace service
     /// </summary>
     /// <param name="managementService">Management service</param>
@@ -71,16 +109,38 @@ namespace NTrace.Services
       this.ManagementService = managementService ?? throw new ArgumentNullException(nameof(managementService));
       this.Options = options ?? throw new ArgumentNullException(nameof(options));
       this.IndentLevel = 0;
+      this.IsEnded = false;
+      this.Messages = new Queue<Message>();
       this.Serializer = new PlainTextTraceObjectSerializer(this.Options);
       this.Timestamps = new Stack<DateTime>();
+      this.ProcessMessagesStopEvent = new ManualResetEvent(false);
+      this.MessageWorker = StartMessageWorker();
     }
 
     /// <summary>
-    /// Finalizer of this default trace service
+    /// Manages the disposal of this instance
     /// </summary>
-    ~DefaultTraceService()
+    /// <param name="disposing">Indicator whether disposing has to be performed or not</param>
+    protected virtual void Dispose(bool disposing)
     {
-      EndWrite();
+      if (!_Disposed)
+      {
+        if (disposing)
+        {
+          EndWrite();
+        }
+
+        _Disposed = true;
+      }
+    }
+
+    /// <summary>
+    /// Disposes this instance of the default trace-service
+    /// </summary>
+    public void Dispose()
+    {
+      Dispose(disposing: true);
+      GC.SuppressFinalize(this);
     }
 
     /// <summary>
@@ -117,7 +177,7 @@ namespace NTrace.Services
     /// <summary>
     /// Pulls the latest timestamp from the stack
     /// </summary>
-    /// <returns>Pulled timestamp or current timestamp in UTC if stack is empty</returns>
+    /// <returns>Pulled timestamp or current timestamp as UTC if stack is empty</returns>
     private DateTime PopTimestamp()
     {
       if (this.Timestamps.Any())
@@ -136,7 +196,21 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Error(string message)
     {
-      this.ManagementService.Tracers.ToList().ForEach(tracer => tracer.Error(GetIndentedMessage(message)));
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
+      string sMessageText = GetIndentedMessage(message);
+
+      // enqueue message if there any asynchronous tracers have been added
+      if (this.ManagementService.HasAsynchronousTracers)
+      {
+        EnqueueMessage(new Message(TraceType.Error, sMessageText));
+      }
+
+      // write message directly for all synchronous tracers
+      this.ManagementService.Tracers.Where(tracer => tracer is not IAsyncTracer).ToList().ForEach(tracer => tracer.Error(sMessageText));
     }
 
     /// <summary>
@@ -146,6 +220,11 @@ namespace NTrace.Services
     /// <param name="data">Data to write</param>
     public void Error(string name, object data)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       // trace each line of serialzed data separately
       foreach (string sLine in this.Serializer.Serialize(name, data).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
       {
@@ -162,7 +241,17 @@ namespace NTrace.Services
     /// <param name="exception">Exception to write</param>
     public void Error(Exception exception)
     {
-      this.ManagementService.Tracers.ToList().ForEach(tracer => tracer.Error(GetIndentedMessage(exception.GetMessageStackString())));
+      if (exception == null)
+      {
+        throw new ArgumentNullException(nameof(exception));
+      }
+
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
+      Error(GetIndentedMessage(exception.GetMessageStackString()));
     }
 
     /// <summary>
@@ -171,7 +260,21 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Warn(string message)
     {
-      this.ManagementService.Tracers.ToList().ForEach(tracer => tracer.Warn(GetIndentedMessage(message)));
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
+      string sMessageText = GetIndentedMessage(message);
+
+      // enqueue message if there any asynchronous tracers have been added
+      if (this.ManagementService.HasAsynchronousTracers)
+      {
+        EnqueueMessage(new Message(TraceType.Warning, sMessageText));
+      }
+
+      // write message directly for all synchronous tracers
+      this.ManagementService.Tracers.Where(tracer => tracer is not IAsyncTracer).ToList().ForEach(tracer => tracer.Warn(sMessageText));
     }
 
     /// <summary>
@@ -181,12 +284,17 @@ namespace NTrace.Services
     /// <param name="data">Data to write</param>
     public void Warn(string name, object data)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       // trace each line of serialzed data separately
       foreach (string sLine in this.Serializer.Serialize(name, data).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
       {
         if (!String.IsNullOrEmpty(sLine))
         {
-          Error(sLine);
+          Warn(sLine);
         }
       }
     }
@@ -198,10 +306,23 @@ namespace NTrace.Services
     /// <param name="categories">Optional. Specifies the category for this message. Default value is <see cref="TraceCategories.Debug"/>.</param>
     public void Info(string message, TraceCategories categories = TraceCategories.Debug)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       if (IsValidCategory(categories))
       {
-        message = GetIndentedMessage(message);
-        this.ManagementService.Tracers.ToList().ForEach(tracer => tracer.Info(message, categories));
+        string sMessageText = GetIndentedMessage(message);
+
+        // enqueue message if there any asynchronous tracers have been added
+        if (this.ManagementService.HasAsynchronousTracers)
+        {
+          EnqueueMessage(new Message(TraceType.Information, sMessageText, categories));
+        }
+
+        // write message directly for all synchronous tracers
+        this.ManagementService.Tracers.Where(tracer => tracer is not IAsyncTracer).ToList().ForEach(tracer => tracer.Info(sMessageText, categories));
       }
     }
 
@@ -213,6 +334,11 @@ namespace NTrace.Services
     /// <param name="categories"></param>
     public void Info(string name, object data, TraceCategories categories = TraceCategories.Debug)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       // trace each line of serialzed data separately
       foreach (string sLine in this.Serializer.Serialize(name, data).Split(new[] { Environment.NewLine }, StringSplitOptions.None))
       {
@@ -229,6 +355,11 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Application(string message)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       Info(message, TraceCategories.Application);
     }
 
@@ -238,6 +369,11 @@ namespace NTrace.Services
     /// <param name="memberName">Optional. Name of the method. Uses the original name if omitted.</param>
     public void BeginMethod([CallerMemberName] string memberName = "")
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       PushIndentLevel();
 
       if (this.Options.UseMethodBlocks)
@@ -257,6 +393,11 @@ namespace NTrace.Services
     /// <param name="memberName">Optional. Name of the method. Uses the original name if omitted.</param>
     public void EndMethod([CallerMemberName] string memberName = "")
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       DateTime dtNow = DateTime.UtcNow;
       DateTime dtEndMethod;
 
@@ -283,6 +424,11 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Connection(string message)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       Info(message, TraceCategories.Connection);
     }
 
@@ -292,6 +438,11 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Query(string message)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       Info(message, TraceCategories.Query);
     }
 
@@ -301,6 +452,11 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Data(string message)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       Info(message, TraceCategories.Data);
     }
 
@@ -311,6 +467,11 @@ namespace NTrace.Services
     /// <param name="data">Data to write</param>
     public void Data(string name, object data)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       Info(name, data, TraceCategories.Data);
     }
 
@@ -320,6 +481,11 @@ namespace NTrace.Services
     /// <param name="message">Message to write</param>
     public void Debug(string message)
     {
+      if (this.IsEnded)
+      {
+        throw new InvalidOperationException("Trace has been ended");
+      }
+
       Info(message, TraceCategories.Debug);
     }
 
@@ -328,7 +494,22 @@ namespace NTrace.Services
     /// </summary>
     public void EndWrite()
     {
-      this.ManagementService.Tracers.ToList().ForEach(tracer => tracer.EndWrite());
+      if (!this.IsEnded)
+      {
+        // stop processing asynchronous messages
+        StopMessageWorker();
+
+        // wait for completion of message worker - if not already aborted due to process termination
+        if (!this.MessageWorker.IsCompleted)
+        {
+          this.MessageWorker.Wait();
+        }
+
+        // signal all tracers to end write messages
+        this.ManagementService.Tracers.ToList().ForEach(tracer => tracer.EndWrite());
+
+        this.IsEnded = true;
+      }
     }
 
     /// <summary>
@@ -399,10 +580,115 @@ namespace NTrace.Services
       }
     }
 
+    /// <summary>
+    /// Enqueues a asynchronous message
+    /// </summary>
+    /// <param name="message">Messgae to add to the queue</param>
+    private void EnqueueMessage(Message message)
+    {
+      if (message == null)
+      {
+        throw new ArgumentNullException(nameof(message));
+      }
+
+      this.Messages.Enqueue(message);
+    }
+
+    /// <summary>
+    /// Dequeues a message
+    /// </summary>
+    /// <returns>Next message from the queue</returns>
+    private Message DequeueMessage()
+    {
+      return this.Messages.Dequeue();
+    }
+
+    /// <summary>
+    /// Starts the backgound worker for processing the messages asynchronously
+    /// </summary>
+    /// <returns>The task of the background worker</returns>
+    private Task StartMessageWorker()
+    {
+      if (this.MessageWorker == null || this.MessageWorker.IsCompleted)
+      {
+        this.ProcessMessagesStopEvent.Reset();
+        this.MessageWorker = Task.Run(() => ProcessMessages(this));
+      }
+
+      return this.MessageWorker;
+    }
+
+    /// <summary>
+    /// Stops the background worker for asynchronous messages
+    /// </summary>
+    private void StopMessageWorker()
+    {
+      if (this.MessageWorker != null && !this.MessageWorker.IsCompleted)
+      {
+        this.ProcessMessagesStopEvent.Set();
+      }
+    }
+
+    /// <summary>
+    /// Processes asynchronous messages
+    /// </summary>
+    private static void ProcessMessages(DefaultTraceService service)
+    {
+      ManualResetEvent[] aoStartedEvents = new ManualResetEvent[]
+                                               {
+                                                 service.ProcessMessagesStopEvent
+                                               };
+
+      while (true)
+      {
+        try
+        {
+          // process all messages in queue
+          while (service.Messages.Any())
+          {
+            Message oMessage = service.DequeueMessage();
+
+            switch (oMessage.MessageType)
+            {
+              case TraceType.Information:
+                service.ManagementService.Tracers.Where(tracer => tracer is IAsyncTracer).ToList().ForEach(tracer => tracer.Info(oMessage.Text, oMessage.Categories));
+                break;
+
+              case TraceType.Warning:
+                service.ManagementService.Tracers.Where(tracer => tracer is IAsyncTracer).ToList().ForEach(tracer => tracer.Warn(oMessage.Text));
+                break;
+
+              case TraceType.Error:
+                service.ManagementService.Tracers.Where(tracer => tracer is IAsyncTracer).ToList().ForEach(tracer => tracer.Error(oMessage.Text));
+                break;
+
+              default:
+                throw new NotSupportedException($@"Trace type ""{oMessage.MessageType}"" for asynchronouse message is not supported");
+            }
+          }
+
+          WaitHandle.WaitAny(aoStartedEvents, _QueueIdleTime);
+
+          if (service.ProcessMessagesStopEvent.WaitOne(0) && !service.Messages.Any())
+          {
+            break;
+          }
+        }
+        catch
+        {
+          WaitHandle.WaitAny(aoStartedEvents, _QueueIdleTime);
+        }
+      }
+    }
+
+    private static TimeSpan _QueueIdleTime = TimeSpan.FromMilliseconds(1000);
+
     private readonly char _IndentCharacter = ' ';
     private readonly string _MethodBlockTopBottomFrame = "+----------------------------------------------------------------------------------+";
     private readonly string _MethodBlockLeftRightFrame = "|";
     private readonly string _MethodBeginBlockIndicator = " >";
     private readonly string _MethodEndBlockIndicator = "< ";
+
+    private bool _Disposed;
   }
 }

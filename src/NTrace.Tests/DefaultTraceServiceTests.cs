@@ -123,10 +123,17 @@ namespace NTrace.Tests
           },
           Name = "Child #1"
         },
-        iValue = 123,
-        lValue = 1234567890344466768L,
+        IntegerValue = 123,
+        LongValue = 1234567890344466768L,
         Password = "top secret"
       };
+    }
+
+    [TestCleanup]
+    public void CleanUp()
+    {
+      this.TraceService.EndWrite();
+      this.TraceService.Dispose();
     }
 
     [TestMethod]
@@ -247,8 +254,8 @@ namespace NTrace.Tests
                         $"      [006]: 32{Environment.NewLine}" +
                         $"      [007]: 64{Environment.NewLine}" +
                         $"      [008]: 128{Environment.NewLine}" +
-                        $"  iValue: 123{Environment.NewLine}" +
-                        $"  lValue: 1234567890344466768{Environment.NewLine}" +
+                        $"  IntegerValue: 123{Environment.NewLine}" +
+                        $"  LongValue: 1234567890344466768{Environment.NewLine}" +
                         $"  Password: <secret>{Environment.NewLine}";
       this.ActualMessages.Clear();
       this.TraceOptions.InspectionDepth = 5;
@@ -285,8 +292,8 @@ namespace NTrace.Tests
                         $"      [006]: 32{Environment.NewLine}" +
                         $"      [007]: 64{Environment.NewLine}" +
                         $"      [008]: 128{Environment.NewLine}" +
-                        $"  iValue: 123{Environment.NewLine}" +
-                        $"  lValue: 1234567890344466768{Environment.NewLine}" +
+                        $"  IntegerValue: 123{Environment.NewLine}" +
+                        $"  LongValue: 1234567890344466768{Environment.NewLine}" +
                         $"  Password: <secret>{Environment.NewLine}";
       this.ActualMessages.Clear();
       this.TraceOptions.InspectionDepth = 3;

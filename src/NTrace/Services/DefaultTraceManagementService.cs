@@ -75,6 +75,15 @@ namespace NTrace.Services
     }
 
     /// <summary>
+    /// Gets an indocator whether any asynchronous tracers have been added or not
+    /// </summary>
+    public bool HasAsynchronousTracers
+    {
+      get;
+      private set;
+    }
+
+    /// <summary>
     /// Creates a new instance of the default trace management service
     /// </summary>
     public DefaultTraceManagementService()
@@ -87,6 +96,7 @@ namespace NTrace.Services
       this.OriginatorName = Environment.UserName;
       this.OriginName = this.AssemblyInfo.Name;
       this.Categories = TraceCategories.Application;
+      this.HasAsynchronousTracers = false;
     }
 
     /// <summary>
@@ -103,6 +113,8 @@ namespace NTrace.Services
       if (!this.Tracers.Contains(tracer))
       {
         _Tracers.Add(tracer);
+
+        this.HasAsynchronousTracers = _Tracers.Any(tracer => tracer is IAsyncTracer);
       }
     }
 
@@ -112,6 +124,8 @@ namespace NTrace.Services
     public void ClearTracers()
     {
       _Tracers.Clear();
+
+      this.HasAsynchronousTracers = false;
     }
 
     /// <summary>
@@ -123,6 +137,8 @@ namespace NTrace.Services
       if (this.Tracers.Contains(tracer))
       {
         _Tracers.Remove(tracer);
+
+        this.HasAsynchronousTracers = _Tracers.Any(tracer => tracer is IAsyncTracer);
       }
     }
 

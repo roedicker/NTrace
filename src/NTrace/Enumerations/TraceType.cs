@@ -6,7 +6,7 @@ namespace NTrace
   /// <summary>
   /// Defines the type of a trace output.
   /// </summary>
-  internal enum TraceType
+  public enum TraceType
   {
     /// <summary>
     /// Information messages.

@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks Condition="'$(LibraryFrameworks)'==''">net45;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(LibraryFrameworks)'!=''">$(LibraryFrameworks)</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
-    <Version>2.0.0</Version>
+    <LangVersion>9.0</LangVersion>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0</FileVersion>
+    <Version>2.1.0</Version>
     <Company>Mark Rödicker</Company>
     <Product>NTrace</Product>
     <Description>Trace Management for .NET</Description>
@@ -16,7 +16,7 @@
     <PackageTags>Trace Log</PackageTags>
     <PackageProjectUrl>https://github.com/roedicker/NTrace/wiki</PackageProjectUrl>
     <RepositoryUrl>https://github.com/roedicker/NTrace</RepositoryUrl>
-    <PackageReleaseNotes>Added support for .NET Framework 4.5 and .NET Standard 2.0
+    <PackageReleaseNotes>Added support for asynchronous processing of trace messages
     </PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
