@@ -5,7 +5,7 @@ using NLog;
 namespace NTrace.Adapters
 {
   /// <summary>
-  /// Defines the NTrace adapter for using NLog
+  /// Defines the synchronous NTrace adapter for using NLog
   /// </summary>
   public class NLogAdapter : ITracer
   {
@@ -18,7 +18,7 @@ namespace NTrace.Adapters
     }
 
     /// <summary>
-    /// Creates a new instance of the NTrace adapter for NLog
+    /// Creates a new instance of the synchronous NTrace adapter for NLog
     /// </summary>
     /// <param name="logger">NLog logger reference</param>
     public NLogAdapter(ILogger logger)

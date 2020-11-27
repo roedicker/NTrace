@@ -3,30 +3,30 @@
     <TargetFrameworks Condition="'$(LibraryFrameworks)'==''">net45;netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(LibraryFrameworks)'!=''">$(LibraryFrameworks)</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0</FileVersion>
-    <Version>2.0.0</Version>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0</FileVersion>
+    <Version>2.1.0</Version>
     <Company>Mark Rödicker</Company>
-    <Product>NTrace</Product>
-    <Description>Trace Management for .NET</Description>
-    <Summary>Trace Management for .NET</Summary>
+    <Product>NTrace.Adapters.NLog</Product>
+    <Description>NLog Adapter for NTrace</Description>
+    <Summary>NLog Adapter using trace management for .NET with NTrace</Summary>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Title>NTrace</Title>
-    <PackageId>NTrace</PackageId>
-    <PackageTags>Trace Log</PackageTags>
+    <Title>NTrace.Adapters.NLog</Title>
+    <PackageId>NTrace.Adapters.NLog</PackageId>
+    <PackageTags>Trace Log NLog</PackageTags>
     <PackageProjectUrl>https://github.com/roedicker/NTrace/wiki</PackageProjectUrl>
     <RepositoryUrl>https://github.com/roedicker/NTrace</RepositoryUrl>
-    <PackageReleaseNotes>Added support for .NET Framework 4.5 and .NET Standard 2.0
+    <PackageReleaseNotes>Added support for asynchronous processing of trace messages
     </PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <RootNamespace>NTrace</RootNamespace>
-    <AssemblyName>NTrace</AssemblyName>
+    <RootNamespace>NTrace.Adapters.NLog</RootNamespace>
+    <AssemblyName>NTrace.Adapters.NLog</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Nullable>enable</Nullable>
     <MinClientVersion>2.12</MinClientVersion>
     <IncludeSymbols>true</IncludeSymbols>
-    <CodeAnalysisRuleset>NTrace.ruleset</CodeAnalysisRuleset>
+    <CodeAnalysisRuleset>NTrace.Adapters.NLog.ruleset</CodeAnalysisRuleset>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <ItemGroup>
@@ -38,7 +38,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NLog" Version="4.7.5" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NTrace\NTrace.csproj" />
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
     <AssemblyTitle>NTrace</AssemblyTitle>

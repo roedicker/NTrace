@@ -57,13 +57,18 @@ namespace NTrace
     /// <summary>
     /// Gets or sets the indicator for writing the process identifier for each trace message.
     /// </summary>
-    /// <value>Indicator for writing the process identifier for each trace message</value>
-    /// <returns>Current indicator for writing the process identifier for each trace message</returns>
-    /// <remarks>The default value is <strong>false</strong>.</remarks>
     bool LogProcessId
     {
       get;
       set;
+    }
+
+    /// <summary>
+    /// Gets an indicator whether any asynchronous tracers hasve been added or not
+    /// </summary>
+    bool HasAsynchronousTracers
+    {
+      get;
     }
 
     /// <summary>

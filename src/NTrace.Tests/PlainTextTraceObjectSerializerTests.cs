@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Security;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using NTrace.Services;
+using NTrace.Serializers;
 using NTrace.Tests.Data;
 
 namespace NTrace.Tests
@@ -53,7 +54,7 @@ namespace NTrace.Tests
               Index = 0,
               Timestamp = new DateTime(2018, 10, 5, 12, 00, 00, DateTimeKind.Local),
               UserName = "User Data #1",
-              UserData = new System.Security.SecureString()
+              UserData = new SecureString()
             },
             new TraceDataChild2()
             {
@@ -67,13 +68,13 @@ namespace NTrace.Tests
               Index = 2,
               Timestamp = new DateTime(2018, 10, 5, 12, 02, 00, DateTimeKind.Local),
               UserName = String.Empty,
-              UserData = new System.Security.SecureString()
+              UserData = new SecureString()
             }
           },
           Name = "Child #1"
         },
-        iValue = 123,
-        lValue = 1234567890344466768L
+        IntegerValue = 123,
+        LongValue = 1234567890344466768L
       };
 
       this.TraceOptions = new TraceOptions();
@@ -121,7 +122,6 @@ namespace NTrace.Tests
 
       // act
       string actual = this.Target.Serialize(sName, dtData);
-
 
       // assert
       Assert.AreEqual(expected, actual);
@@ -282,8 +282,8 @@ namespace NTrace.Tests
                         $"      [006]: 32{Environment.NewLine}" +
                         $"      [007]: 64{Environment.NewLine}" +
                         $"      [008]: 128{Environment.NewLine}" +
-                        $"  iValue: 123{Environment.NewLine}" +
-                        $"  lValue: 1234567890344466768{Environment.NewLine}" +
+                        $"  IntegerValue: 123{Environment.NewLine}" +
+                        $"  LongValue: 1234567890344466768{Environment.NewLine}" +
                         $"  Password: <secret>{Environment.NewLine}";
       this.TraceOptions.InspectionDepth = 5;
 

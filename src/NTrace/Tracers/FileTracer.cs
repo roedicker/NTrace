@@ -1,21 +1,13 @@
 using System;
 using System.IO;
 
-namespace NTrace.Services
+namespace NTrace.Tracers
 {
   /// <summary>
-  /// Tracer class for writing trace messages into a file on the file system.
+  /// Defines the synchronous file-tracer.
   /// </summary>
   public class FileTracer : ITracer
   {
-    /// <summary>
-    /// Gets the lock object for this service
-    /// </summary>
-    protected object LockObject
-    {
-      get;
-    }
-
     /// <summary>
     /// Gets the stream writer for writing the file log.
     /// </summary>
@@ -70,6 +62,27 @@ namespace NTrace.Services
     }
 
     /// <summary>
+    /// Initializes a new instance of the file tracer class.
+    /// </summary>
+    public FileTracer()
+    {
+      this.StreamWriter = null;
+      this.FilePath = String.Empty;
+      this.FileName = String.Empty;
+      this.Append = true;
+      this.AutoFlush = false;
+      this.Share = false;
+    }
+
+    /// <summary>
+    /// Reintializes the current instance of the file tracer class.
+    /// </summary>
+    ~FileTracer()
+    {
+      CloseStream();
+    }
+
+    /// <summary>
     /// Checks if a stream for the current trace file exists, otherwise create a new stream writer.
     /// </summary>
     /// <returns><strong>true</strong> if stream exists or was created successfully, otherwise <strong>false</strong>.</returns>
@@ -119,7 +132,7 @@ namespace NTrace.Services
     /// </summary>
     protected void CloseStream()
     {
-      lock (this.LockObject)
+      lock (_StreamLock)
       {
         try
         {
@@ -134,28 +147,6 @@ namespace NTrace.Services
           this.StreamWriter = null;
         }
       }
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the file tracer class.
-    /// </summary>
-    public FileTracer()
-    {
-      this.StreamWriter = null;
-      this.FilePath = String.Empty;
-      this.FileName = String.Empty;
-      this.LockObject = new object();
-      this.Append = true;
-      this.AutoFlush = false;
-      this.Share = false;
-    }
-
-    /// <summary>
-    /// Reintializes the current instance of the file tracer class.
-    /// </summary>
-    ~FileTracer()
-    {
-      CloseStream();
     }
 
     /// <summary>
@@ -227,5 +218,7 @@ namespace NTrace.Services
     {
       CloseStream();
     }
+
+    private readonly object _StreamLock = new object();
   }
 }

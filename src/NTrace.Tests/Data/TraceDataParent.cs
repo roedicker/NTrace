@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security;
 
 namespace NTrace.Tests.Data
@@ -11,13 +11,13 @@ namespace NTrace.Tests.Data
       set;
     }
 
-    public int iValue
+    public int IntegerValue
     {
       get;
       set;
     }
 
-    public long lValue
+    public long LongValue
     {
       get;
       set;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using NTrace.Attributes;
@@ -32,7 +32,9 @@ namespace NTrace.Tests.Data
       set;
     }
 
+#pragma warning disable CA1819 // Properties should not return arrays
     public byte[] Data
+#pragma warning restore CA1819 // Properties should not return arrays
     {
       get;
       set;

@@ -85,11 +85,12 @@ namespace NTrace
     /// </summary>
     public TraceOptions()
     {
-      this.UseIndention = true;
+      _DefaultInspectionDepth = 2;
       _IndentionWidth = 2;
+
+      this.UseIndention = true;
       this.UseMethodBlocks = true;
       this.UseMethodDurations = false;
-      _DefaultInspectionDepth = 2;
     }
 
     private int _IndentionWidth;
