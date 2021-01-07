@@ -1,5 +1,7 @@
 using System;
 
+using NTrace.Attributes;
+
 namespace NTrace
 {
   /// <summary>
@@ -10,6 +12,7 @@ namespace NTrace
     /// <summary>
     /// Gets or sets the trace service
     /// </summary>
+    [DoNotTrace]
     public virtual ITraceService? TraceService
     {
       get;
